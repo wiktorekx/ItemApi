@@ -1,12 +1,9 @@
 package pl.wiktorekx.wxitemapi.replacer;
 
-import org.bukkit.inventory.ItemStack;
 import pl.wiktorekx.wxitemapi.Item;
 import pl.wiktorekx.wxitemapi.metadata.DefaultItemMetadataKeys;
 import pl.wiktorekx.wxitemapi.metadata.ItemMetadata;
-import pl.wiktorekx.wxitemapi.metadata.ItemMetadataKey;
 
-import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
