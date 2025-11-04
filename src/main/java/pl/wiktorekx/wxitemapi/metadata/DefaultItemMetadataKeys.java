@@ -9,6 +9,7 @@ public interface DefaultItemMetadataKeys {
     ItemMetadataKey<List<String>> LORE = ItemMetadataKey.create("lore");
     ItemMetadataKey<Boolean> UNBREAKABLE = ItemMetadataKey.create("unbreakable");
     ItemMetadataKey<Integer> DAMAGE = ItemMetadataKey.create("damage");
+    ItemMetadataKey<Short> MATERIAL_DATA = ItemMetadataKey.create("material-data");
     ItemMetadataKey<List<String>> ITEM_FLAGS = ItemMetadataKey.create("item-flags");
     ItemMetadataKey<Map<String, Integer>> ENCHANTS = ItemMetadataKey.create("enchants");
     ItemMetadataKey<String> SKULL_OWNER = ItemMetadataKey.create("skull-owner");

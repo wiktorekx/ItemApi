@@ -3,8 +3,20 @@ package pl.wiktorekx.wxitemapi.metadata;
 import java.util.*;
 import java.util.function.BiConsumer;
 
-public class ItemMetadata {
-    private final Map<ItemMetadataKey<Object>, Object> metadataMap = new HashMap<>();
+public final class ItemMetadata {
+    private final Map<ItemMetadataKey<Object>, Object> metadataMap;
+
+    public static ItemMetadata create() {
+        return new ItemMetadata(new HashMap<>());
+    }
+
+    public static ItemMetadata fromMap(Map<ItemMetadataKey<Object>, Object> metadataMap) {
+        return new ItemMetadata(new HashMap<>(metadataMap));
+    }
+
+    private ItemMetadata(Map<ItemMetadataKey<Object>, Object> metadataMap) {
+        this.metadataMap = metadataMap;
+    }
 
     @SuppressWarnings("unchecked")
     public <T> T getMetadata(ItemMetadataKey<T> key) {
@@ -15,40 +27,30 @@ public class ItemMetadata {
         return metadataMap.containsKey(Objects.requireNonNull(key, "key is null"));
     }
 
+    public Map<ItemMetadataKey<Object>, Object> toMap() {
+        return new HashMap<>(metadataMap);
+    }
+
     @SuppressWarnings("unchecked")
-    public <T> void setMetadata(ItemMetadataKey<T> key, T value) {
-        metadataMap.put((ItemMetadataKey<Object>) Objects.requireNonNull(key, "key is null"), Objects.requireNonNull(value, "value is null"));
+    public <T> ItemMetadata setMetadata(ItemMetadataKey<T> key, T value) {
+        Map<ItemMetadataKey<Object>, Object> map = toMap();
+        map.put((ItemMetadataKey<Object>) Objects.requireNonNull(key, "key is null"), Objects.requireNonNull(value, "value is null"));
+        return new ItemMetadata(map);
     }
 
-    public void removeMetadata(ItemMetadataKey<?> key) {
-        metadataMap.remove(Objects.requireNonNull(key, "key is null"));
-    }
-
-    public void forEach(BiConsumer<ItemMetadataKey<Object>, Object> consumer) {
-        Objects.requireNonNull(consumer, "consumer is null");
-        for(Map.Entry<ItemMetadataKey<Object>, Object> entry : entrySet()){
-            consumer.accept(entry.getKey(), entry.getValue());
+    public ItemMetadata removeMetadata(ItemMetadataKey<?> key) {
+        if(!hasMetadata(key)) {
+            return this;
         }
-    }
-
-    public Set<Map.Entry<ItemMetadataKey<Object>, Object>> entrySet() {
-        return metadataMap.entrySet();
-    }
-
-    public void clear() {
-        metadataMap.clear();
-    }
-
-    public ItemMetadata clone() {
-        ItemMetadata itemMetadata = new ItemMetadata();
-        forEach(itemMetadata::setMetadata);
-        return itemMetadata;
+        Map<ItemMetadataKey<Object>, Object> map = toMap();
+        map.remove(Objects.requireNonNull(key, "key is null"));
+        return new ItemMetadata(map);
     }
 
     @Override
     public String toString() {
         StringJoiner stringJoiner = new StringJoiner(", ");
-        forEach((key, value) -> stringJoiner.add(key.getName() + "=\"" + value + "\""));
+        toMap().forEach((key, value) -> stringJoiner.add(key.getName() + "=\"" + value + "\""));
         return "ItemMetadata{" + stringJoiner + "}";
     }
 }

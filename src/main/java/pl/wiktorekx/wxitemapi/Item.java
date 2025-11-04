@@ -7,80 +7,65 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 public final class Item {
-    private String material;
-    private int amount = 1;
-    private int data;
-    private ItemMetadata itemMetadata;
+    private final String material;
+    private final int amount;
+    private final ItemMetadata metadata;
 
-    public Item() {
-        this("AIR");
+    public static Item create(String material) {
+        return create(material, ItemMetadata.create());
     }
 
-    public Item(String material) {
-        setMaterial(material);
+    public static Item create(String material, ItemMetadata metadata) {
+        return create(material, 1, metadata);
     }
 
-    public Item(String material, int amount) {
-        setMaterial(material);
-        setAmount(amount);
+    public static Item create(String material, int amount) {
+        return create(material, amount, ItemMetadata.create());
     }
 
-    public Item(String material, int amount, ItemMetadata metadata) {
-        setMaterial(material);
-        setAmount(amount);
-        setMetadata(metadata);
+    public static Item create(String material, int amount, ItemMetadata metadata) {
+        Objects.requireNonNull(material, "Material is null");
+        Objects.requireNonNull(metadata, "Metadata is null");
+        return new Item(material, amount, metadata);
     }
 
-    public Item(String material, int amount, int data) {
-        setMaterial(material);
-        setAmount(amount);
-        setData(data);
-    }
-
-    public Item(String material, int amount, int data, ItemMetadata metadata) {
-        setMaterial(material);
-        setAmount(amount);
-        setData(data);
-        setMetadata(metadata);
+    private Item(String material, int amount, ItemMetadata metadata) {
+        this.material = material;
+        this.amount = amount;
+        this.metadata = metadata;
     }
 
     public String getMaterial() {
         return material;
     }
 
-    public Item setMaterial(String material) {
-        this.material = Objects.requireNonNull(material, "material is null");
-        return this;
-    }
-
     public int getAmount() {
         return amount;
     }
 
-    public Item setAmount(int amount) {
-        this.amount = amount;
-        return this;
-    }
-
-    public int getData() {
-        return data;
-    }
-
-    public Item setData(int data) {
-        this.data = data;
-        return this;
-    }
-
     public ItemMetadata getMetadata() {
-        if(itemMetadata == null) itemMetadata = new ItemMetadata();
-        return itemMetadata;
+        return metadata;
     }
 
-    public Item setMetadata(ItemMetadata metadata) {
-        this.itemMetadata = Objects.requireNonNull(metadata, "metadata is null");
-        return this;
+    public Item setMaterial(String material) {
+        Objects.requireNonNull(material, "Material is null");
+        return new Item(material, getAmount(), getMetadata());
+    }
+
+    public Item setAmount(int amount) {
+        return new Item(getMaterial(), amount, getMetadata());
+    }
+
+    public Item setMetadata(ItemMetadata itemMetadata) {
+        Objects.requireNonNull(itemMetadata, "Metadata is null");
+        return new Item(getMaterial(), getAmount(), itemMetadata);
+    }
+
+    public Item replaceMetadata(Function<ItemMetadata, ItemMetadata> replaceFunction) {
+        return setMetadata(replaceFunction.apply(getMetadata()));
     }
 
     public String getDisplayName() {
@@ -88,12 +73,10 @@ public final class Item {
     }
 
     public Item setDisplayName(String displayName) {
-        if(displayName != null) {
-            getMetadata().setMetadata(DefaultItemMetadataKeys.DISPLAY_NAME, displayName);
-        } else {
-            getMetadata().removeMetadata(DefaultItemMetadataKeys.DISPLAY_NAME);
-        }
-        return this;
+        return replaceMetadata(itemMetadata -> displayName != null ?
+                itemMetadata.setMetadata(DefaultItemMetadataKeys.DISPLAY_NAME, displayName) :
+                itemMetadata.removeMetadata(DefaultItemMetadataKeys.DISPLAY_NAME)
+        );
     }
 
     public List<String> getLore() {
@@ -102,24 +85,18 @@ public final class Item {
     }
 
     public Item setLore(List<String> lore) {
-        if(lore != null) {
-            getMetadata().setMetadata(DefaultItemMetadataKeys.LORE, new ArrayList<>(lore));
-        } else {
-            getMetadata().removeMetadata(DefaultItemMetadataKeys.LORE);
-        }
-        return this;
+        return replaceMetadata(itemMetadata -> lore != null ?
+                itemMetadata.setMetadata(DefaultItemMetadataKeys.LORE, lore) :
+                itemMetadata.removeMetadata(DefaultItemMetadataKeys.LORE)
+        );
     }
 
     public Item addLore(String... lore) {
         if(lore.length > 0) {
             List<String> loreList = getLore();
             loreList.addAll(Arrays.asList(lore));
-            setLore(loreList);
+            return setLore(loreList);
         }
         return this;
-    }
-
-    public Item clone() {
-        return new Item(getMaterial(), getAmount(), getData(), getMetadata().clone());
     }
 }

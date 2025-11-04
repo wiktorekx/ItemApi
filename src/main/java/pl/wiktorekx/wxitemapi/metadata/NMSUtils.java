@@ -18,7 +18,7 @@ public final class NMSUtils {
 
     static {
         try {
-            String nmsVersion = MinecraftVersion.getInstance().getNmsVersion();
+            String nmsVersion = MinecraftVersion.getNmsVersion();
             PLAYER_PROFILE_CLASS = Class.forName("org.bukkit.craftbukkit." + nmsVersion + ".profile.CraftPlayerProfile");
             GAME_PROFILE_CLASS = Class.forName("com.mojang.authlib.GameProfile");
             PROPERTY_CLASS = Class.forName("com.mojang.authlib.properties.Property");
